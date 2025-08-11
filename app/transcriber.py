@@ -1,3 +1,4 @@
+import os
 import vosk
 import json
 import wave
@@ -31,6 +32,11 @@ class Transcriber:
 		if text is None:
 			logging.error("No transcription to store.")
 			return
+		
+		directory = os.path.dirname(file_path)
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		
 		with open(file_path, 'a') as file:
 			file.write(f"{author}: {text}\n")
 		logging.debug(f"Transcription added to {file_path}")

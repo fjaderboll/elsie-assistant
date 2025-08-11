@@ -1,6 +1,8 @@
 import logging
 import time
+import json
 import sys
+import os
 import argparse
 import traceback
 
@@ -9,12 +11,12 @@ from transcriber import Transcriber
 from response_generator import ResponseGenerator
 
 class Assistant:
-	def __init__(self, personality, debug=False, vosk_model_path=None, ollama_model='llama3'):
-		self.personality = personality
-		self.debug = debug
+	def __init__(self, config):
+		self.personality = config['personality']
+		self.debug = config['debug']
 		self.audio_processor = AudioProcessor()
-		self.transcriber = Transcriber(model_path=vosk_model_path)
-		self.response_generator = ResponseGenerator(model=ollama_model)
+		self.transcriber = Transcriber(model_path=config['voskModelPath'])
+		self.response_generator = ResponseGenerator(model=config['ollamaModel'])
 
 	def start(self):
 		logging.info("Starting Elsie Voice Assistant")
@@ -26,7 +28,7 @@ class Assistant:
 				# record audio from the microphone
 				recorded_audio = self.audio_processor.record_audio()
 				if not recorded_audio:
-					logging.info("No audio recorded, starting recording again")
+					logging.info("No audio recorded, starting to record again")
 					continue
 				if self.debug:
 					self.audio_processor.store_audio(recorded_audio, 'temp/user_recording.wav')
@@ -34,7 +36,7 @@ class Assistant:
 				# transcribe the audio
 				user_text = self.transcriber.transcribe_audio(wave_data=recorded_audio)
 				if not user_text:
-					logging.warning("Transcription not successful, starting recording again")
+					logging.warning("Transcription not successful, starting to record again")
 					continue
 				if self.debug:
 					self.transcriber.store_transcription('User', user_text, 'temp/transcription.log')
@@ -63,17 +65,18 @@ class Assistant:
 				time.sleep(10)
 
 if __name__ == "__main__":
-	DEFAULT_PERSONALITY = "You are a helpful robot called Elsie. You are friendly and fun and you will try to be helpful. Your answers are short and concise like in a verbal conversation."
-
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
-	parser.add_argument('--personality', help='Starting personality description', default=DEFAULT_PERSONALITY, type=str)
-	parser.add_argument('--vosk-model', help='Path to alternative Vosk model (by default a slim English model will be used)', default=None, type=str)
-	parser.add_argument('--ollama-model', help='Ollama model to use for response generation', default='llama3', type=str)
+	parser.add_argument('-c', '--config', help='Path to config file (default: settings.json)', default='settings.json', type=str)
 	args = parser.parse_args()
 
-	log_level = logging.DEBUG if args.debug else logging.INFO
+	if not os.path.isfile(args.config):
+		logging.error(f"Config file '{args.config}' does not exist.")
+		sys.exit(1)
+	
+	config = json.load(open(args.config, 'r'))
+
+	log_level = logging.DEBUG if config['debug'] else logging.INFO
 	logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
-	assistant = Assistant(args.personality, debug=args.debug, vosk_model_path=args.vosk_model, ollama_model=args.ollama_model)
+	assistant = Assistant(config)
 	assistant.start()
