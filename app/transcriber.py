@@ -27,14 +27,13 @@ class Transcriber:
 		result = json.loads(self.recognizer.FinalResult())
 		return result['text']
 
-	def store_transcription(self, text, file_path):
+	def store_transcription(self, author, text, file_path):
 		if text is None:
 			logging.error("No transcription to store.")
 			return
 		with open(file_path, 'a') as file:
-			file.write(text)
-			file.write('\n')
-		logging.debug(f"Transcription saved to {file_path}")
+			file.write(f"{author}: {text}\n")
+		logging.debug(f"Transcription added to {file_path}")
 
 if __name__ == "__main__":
 	transcriber = Transcriber()

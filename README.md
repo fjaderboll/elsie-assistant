@@ -23,8 +23,13 @@ pip install -r requirements.txt
 
 ## Run
 ```shell
+# start ollama server
+docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama             # only CPU
+docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama --gpus=all ollama/ollama  # with GPUs
+
+# start assistant
 source .venv/bin/activate
-python3 app/assistant.py               # default run
+python3 app/assistant.py               
 
 # variants
 python3 app/assistant.py --debug       # view more stuff
@@ -34,7 +39,7 @@ python3 app/assistant.py --help        # view all options
 
 ## Optional models
 
-### Speech-to-text
+### Speech-to-text model
 Download an alternative [model](https://alphacephei.com/vosk/models) and then use flag `--vosk-model` to specify its path.
 
 ```shell
@@ -42,6 +47,11 @@ mkdir -p models
 curl https://alphacephei.com/vosk/models/vosk-model-en-us-0.22.zip -o temp/vosk-model-en-us-0.22.zip
 unzip temp/vosk-model-en-us-0.22.zip -d models/
 ```
+
+### Response model (Ollama)
+Default model is `llama3`, but for this case there are better options, like `mistral` 
+Start a chat to pre-load another model: `docker exec -it ollama ollama run mistral`.
+Then run the assistant with `--ollama-model mistral`
 
 ## Related projects
 * https://github.com/PromtEngineer/Verbi/ (another voice assistant)
