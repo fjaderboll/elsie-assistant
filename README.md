@@ -29,15 +29,11 @@ docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama --gpus=all ol
 
 # start assistant
 source .venv/bin/activate
-python3 app/assistant.py               
-
-# variants
-python3 app/assistant.py --debug       # view more stuff
-python3 app/assistant.py 2> /dev/null  # cleaner output
-python3 app/assistant.py --help        # view all options
+python3 app/assistant.py [--help]
 ```
 
 ## Optional models
+Depending on your needs and computer performance, you may want to tweak this.
 
 ### Speech-to-text model
 Download an alternative [model](https://alphacephei.com/vosk/models) and then use flag `--vosk-model` to specify its path.
