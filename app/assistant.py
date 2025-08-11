@@ -2,6 +2,7 @@ import logging
 import time
 import sys
 import argparse
+import traceback
 
 from audio_processor import AudioProcessor
 from transcriber import Transcriber
@@ -28,15 +29,17 @@ class Assistant:
 			try:
 				# record audio from the microphone
 				recorded_audio = self.audio_processor.record_audio()
+				if not recorded_audio:
+					logging.info("No audio recorded, starting recording again")
+					continue
 				if self.debug:
 					self.audio_processor.store_audio(recorded_audio, 'temp/user_recording.wav')
 			
 				# transcribe the audio
 				user_text = self.transcriber.transcribe_audio(wave_data=recorded_audio)
 				if not user_text:
-					logging.info("Transcription not successful. Starting recording again.")
+					logging.warning("Transcription not successful, starting recording again")
 					continue
-				
 				if self.debug:
 					self.transcriber.store_transcription(user_text, 'temp/user_transcription.log')
 
@@ -62,6 +65,8 @@ class Assistant:
 				break
 			except Exception as e:
 				logging.error(f"An error occurred: {e}")
+				if self.debug:
+					print(traceback.format_exc())
 				time.sleep(10)
 
 if __name__ == "__main__":
@@ -71,7 +76,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	log_level = logging.DEBUG if args.debug else logging.INFO
-	logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
+	logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 	assistant = Assistant(debug=args.debug, vosk_model_path=args.vosk_model)
 	assistant.start()

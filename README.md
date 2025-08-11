@@ -6,7 +6,7 @@ Realtime AI voice assistant, or just your friendly chat bot.
 It's fully open source and offline and runs local on your computer.
 
 End goal is to integrate this in a physical robot, like the *Elsie*
-assistant from the movie *M3GAN*.
+assistant from the movie *M3GAN*, hence the name.
 
 ## Setup
 First time only.
@@ -24,7 +24,12 @@ pip install -r requirements.txt
 ## Run
 ```shell
 source .venv/bin/activate
-python3 app/assistant.py [--help]
+python3 app/assistant.py               # default run
+
+# variants
+python3 app/assistant.py --debug       # view more stuff
+python3 app/assistant.py 2> /dev/null  # cleaner output
+python3 app/assistant.py --help        # view all options
 ```
 
 ## Optional models
