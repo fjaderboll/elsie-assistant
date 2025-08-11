@@ -4,6 +4,7 @@ PyAudio==0.2.14
 pygame==2.6.1
 SpeechRecognition==3.14.3
 vosk==0.3.45
+yapper-tts==0.7.1
 # dependencies to above
 annotated-types==0.7.0
 anyio==4.10.0

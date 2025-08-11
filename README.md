@@ -1,5 +1,4 @@
 # Elsie - voice assistant
-**NOTE**, development in progress, not yet fully functional.
 
 ## About
 Realtime AI voice assistant, or just your friendly chat bot.
@@ -25,6 +24,8 @@ cp settings.default.json settings.json
 ```
 
 ## Run
+The first time you run it, make sure to have a Internet connection.
+
 ```shell
 # start ollama server
 docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama             # only CPU
@@ -43,7 +44,7 @@ Depending on your needs and computer performance, you may want to tweak this.
 
 ### Speech-to-text model
 Download an alternative [model](https://alphacephei.com/vosk/models) and then update `voskModelPath` in `settings.json`.
-The larger English model seems to be slightly more accurate, though also slower.
+The larger English model seems to be slightly more accurate, but slower.
 It's also possible to switch input language by doing this (assuming the other models support it).
 
 ```shell
@@ -56,10 +57,11 @@ jq '.voskModelPath = "models/vosk-model-en-us-0.22"' settings.default.json > set
 ### Response model (Ollama)
 Default model is `llama3`, but for this case there are better [libraries](https://ollama.com/library),
 like [mistral](https://ollama.com/library/mistral).
-Start a chat to pre-load another model: `docker exec -it ollama ollama run mistral`.
+Download the model by running: `docker exec -it ollama ollama pull mistral`.
 Then update property `ollamaModel` in `settings.json`.
 
 ## Related projects
 * https://github.com/PromtEngineer/Verbi/ (another voice assistant)
 * https://alphacephei.com/vosk (speech-to-text)
-* https://ollama.com
+* https://ollama.com (the ai)
+* https://github.com/n1teshy/yapper-tts (text-to-speech)

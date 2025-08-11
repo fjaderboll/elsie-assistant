@@ -9,6 +9,7 @@ import traceback
 from audio_processor import AudioProcessor
 from transcriber import Transcriber
 from response_generator import ResponseGenerator
+from tts import TextToSpeech
 
 class Assistant:
 	def __init__(self, config):
@@ -17,6 +18,7 @@ class Assistant:
 		self.audio_processor = AudioProcessor()
 		self.transcriber = Transcriber(model_path=config['voskModelPath'])
 		self.response_generator = ResponseGenerator(model=config['ollamaModel'])
+		self.tts = TextToSpeech()
 
 	def start(self):
 		logging.info("Starting Elsie Voice Assistant")
@@ -50,11 +52,8 @@ class Assistant:
 				if self.debug:
 					self.transcriber.store_transcription('Assistant', response_text, 'temp/transcription.log')
 
-	#			# convert the response text to speech
-	#			response_audio = text_to_speech(response_text)
-	#
-	#			# play the generated speech audio
-	#			self.audio_processor.play_audio(response_audio)
+				# playback the response text
+				self.tts.say(response_text)
 			except KeyboardInterrupt:
 				logging.info("Aborted by user")
 				break
