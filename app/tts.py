@@ -1,9 +1,12 @@
-from yapper import Yapper, PiperSpeaker, PiperVoiceUS
+import wave
+from pathlib import Path
+from piper import PiperVoice, download_voices
 
 class TextToSpeech:
-	def __init__(self):
-		speaker = PiperSpeaker(voice=PiperVoiceUS.AMY)
-		self.yapper = Yapper(speaker=speaker)
+	def __init__(self, model):
+		download_voices.download_voice(model, Path('models'))
+		self.voice = PiperVoice.load(f'models/{model}.onnx')
 
-	def say(self, text):
-		self.yapper.yap(text)
+	def convert_to_wave(self, text, output_path):
+		with wave.open(output_path, "wb") as wave_file:
+			self.voice.synthesize_wav(text, wave_file)

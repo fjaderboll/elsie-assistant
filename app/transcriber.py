@@ -5,9 +5,9 @@ import wave
 import logging
 
 class Transcriber:
-	def __init__(self, lang='en-us', model_path=None):
-		if model_path is not None:
-			model = vosk.Model(model_path)
+	def __init__(self, lang='en-us', model_name=None):
+		if model_name is not None:
+			model = vosk.Model(f'models/{model_name}')
 		else:
 			model = vosk.Model(lang=lang)
 		self.recognizer = vosk.KaldiRecognizer(model, 16000)
@@ -34,9 +34,8 @@ class Transcriber:
 			return
 		
 		directory = os.path.dirname(file_path)
-		if not os.path.exists(directory):
-			os.makedirs(directory)
-		
+		os.makedirs(directory, exist_ok=True)
+
 		with open(file_path, 'a') as file:
 			file.write(f"{author}: {text}\n")
 		logging.debug(f"Transcription added to {file_path}")

@@ -1,10 +1,10 @@
 import logging
 import time
-import json
 import sys
 import os
 import argparse
 import traceback
+from configparser import ConfigParser
 
 from audio_processor import AudioProcessor
 from transcriber import Transcriber
@@ -12,13 +12,13 @@ from response_generator import ResponseGenerator
 from tts import TextToSpeech
 
 class Assistant:
-	def __init__(self, config):
-		self.personality = config['personality']
-		self.debug = config['debug']
+	def __init__(self, config: ConfigParser):
+		self.personality = config['response-generation']['personality']
+		self.debug = config['default'].getboolean('debug')
 		self.audio_processor = AudioProcessor()
-		self.transcriber = Transcriber(model_path=config['voskModelPath'])
-		self.response_generator = ResponseGenerator(model=config['ollamaModel'])
-		self.tts = TextToSpeech()
+		self.transcriber = Transcriber(lang=config['speech-to-text']['lang'], model_name=config['speech-to-text'].get('model', None))
+		self.response_generator = ResponseGenerator(model=config['response-generation']['model'])
+		self.tts = TextToSpeech(model=config['text-to-speech']['model'])
 
 	def start(self):
 		logging.info("Starting Elsie Voice Assistant")
@@ -52,8 +52,11 @@ class Assistant:
 				if self.debug:
 					self.transcriber.store_transcription('Assistant', response_text, 'temp/transcription.log')
 
-				# playback the response text
-				self.tts.say(response_text)
+				# generate audio from the response text
+				self.tts.convert_to_wave(response_text, 'temp/response.wav')
+
+				# play the audio response
+				self.audio_processor.play_audio('temp/response.wav')
 			except KeyboardInterrupt:
 				logging.info("Aborted by user")
 				break
@@ -65,17 +68,20 @@ class Assistant:
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-c', '--config', help='Path to config file (default: settings.json)', default='settings.json', type=str)
+	parser.add_argument('-c', '--config', help='Path to config file (default: settings.ini)', default='settings.ini', type=str)
 	args = parser.parse_args()
 
 	if not os.path.isfile(args.config):
 		logging.error(f"Config file '{args.config}' does not exist.")
 		sys.exit(1)
-	
-	config = json.load(open(args.config, 'r'))
 
-	log_level = logging.DEBUG if config['debug'] else logging.INFO
+	config = ConfigParser()
+	config.read(args.config)
+
+	log_level = logging.DEBUG if config['default'].getboolean('debug') else logging.INFO
 	logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+
+	os.makedirs('temp', exist_ok=True)
 
 	assistant = Assistant(config)
 	assistant.start()

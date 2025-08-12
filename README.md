@@ -20,7 +20,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # begin with default settings
-cp settings.default.json settings.json
+cp settings.default.ini settings.ini
 ```
 
 ## Run
@@ -40,10 +40,10 @@ python3 app/assistant.py 2> /dev/null
 ```
 
 ## Optional models
-Depending on your needs and computer performance, you may want to tweak this.
+Depending on your needs and computer performance, you may want tweak `settings.ini`.
 
 ### Speech-to-text model
-Download an alternative [model](https://alphacephei.com/vosk/models) and then update `voskModelPath` in `settings.json`.
+Download an alternative [model](https://alphacephei.com/vosk/models) and then update `voskModelPath` in `settings.ini`.
 The larger English model seems to be slightly more accurate, but slower.
 It's also possible to switch input language by doing this (assuming the other models support it).
 
@@ -58,10 +58,10 @@ jq '.voskModelPath = "models/vosk-model-en-us-0.22"' settings.default.json > set
 Default model is `llama3`, but for this case there are better [libraries](https://ollama.com/library),
 like [mistral](https://ollama.com/library/mistral).
 Download the model by running: `docker exec -it ollama ollama pull mistral`.
-Then update property `ollamaModel` in `settings.json`.
+Then update property `ollamaModel` in `settings.ini`.
 
 ## Related projects
 * https://github.com/PromtEngineer/Verbi/ (another voice assistant)
 * https://alphacephei.com/vosk (speech-to-text)
 * https://ollama.com (the ai)
-* https://github.com/n1teshy/yapper-tts (text-to-speech)
+* https://github.com/OHF-Voice/piper1-gpl (text-to-speech)
