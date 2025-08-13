@@ -46,8 +46,9 @@ class AudioProcessor:
 
 	def store_audio(self, wave_data, file_path):
 		directory = os.path.dirname(file_path)
-		os.makedirs(directory, exist_ok=True)
-		
+		if directory:
+			os.makedirs(directory, exist_ok=True)
+
 		with open(file_path, "wb") as audio_file:
 			audio_file.write(wave_data)
 		logging.debug(f"Audio saved to {file_path}")

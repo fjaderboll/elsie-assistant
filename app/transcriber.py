@@ -28,18 +28,6 @@ class Transcriber:
 		result = json.loads(self.recognizer.FinalResult())
 		return result['text']
 
-	def store_transcription(self, author, text, file_path):
-		if text is None:
-			logging.error("No transcription to store.")
-			return
-		
-		directory = os.path.dirname(file_path)
-		os.makedirs(directory, exist_ok=True)
-
-		with open(file_path, 'a') as file:
-			file.write(f"{author}: {text}\n")
-		logging.debug(f"Transcription added to {file_path}")
-
 if __name__ == "__main__":
 	transcriber = Transcriber()
 	text = transcriber.transcribe_audio(wave_file_path='temp/user_recording.wav')

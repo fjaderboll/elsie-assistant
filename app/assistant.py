@@ -1,5 +1,6 @@
 import logging
 import time
+import json
 import sys
 import os
 import argparse
@@ -13,17 +14,35 @@ from tts import TextToSpeech
 
 class Assistant:
 	def __init__(self, config: ConfigParser):
-		self.personality = config['response-generation']['personality']
 		self.debug = config['default'].getboolean('debug')
 		self.audio_processor = AudioProcessor()
 		self.transcriber = Transcriber(lang=config['speech-to-text']['lang'], model_name=config['speech-to-text'].get('model', None))
 		self.response_generator = ResponseGenerator(model=config['response-generation']['model'])
 		self.tts = TextToSpeech(model=config['text-to-speech']['model'])
+		self.load_chat_history(config['response-generation']['personality'], config['default'].get('chat_history_file', None))
+
+	def load_chat_history(self, personality, chat_history_file):
+		self.chat_history = [{ "role": "system", "content": personality }]
+		self.chat_history_file = chat_history_file
+		
+		if self.chat_history_file:
+			if os.path.isfile(chat_history_file):
+				with open(chat_history_file, 'r') as file:
+					self.chat_history = json.load(file)
+					logging.info(f"Loaded chat history from {chat_history_file}")
+	
+	def store_chat_history(self):
+		if self.chat_history_file:
+			directory = os.path.dirname(self.chat_history_file)
+			if directory:
+				os.makedirs(directory, exist_ok=True)
+
+			with open(self.chat_history_file, 'w') as file:
+				json.dump(self.chat_history, file, indent=4)
+			logging.debug(f"Chat history saved to {self.chat_history_file}")
 
 	def start(self):
 		logging.info("Starting Elsie Voice Assistant")
-
-		chat_history = [{ "role": "system", "content": self.personality }]
 
 		while True:
 			try:
@@ -40,17 +59,14 @@ class Assistant:
 				if not user_text:
 					logging.warning("Transcription not successful, starting to record again")
 					continue
-				if self.debug:
-					self.transcriber.store_transcription('User', user_text, 'temp/transcription.log')
 				logging.info("User said: " + user_text)
 
 				# generate a response
-				chat_history.append({"role": "user", "content": user_text})
-				response_text = self.response_generator.generate_response(chat_history)
+				self.chat_history.append({"role": "user", "content": user_text})
+				response_text = self.response_generator.generate_response(self.chat_history)
 				logging.info("Assistant replied: " + response_text)
-				chat_history.append({"role": "assistant", "content": response_text})
-				if self.debug:
-					self.transcriber.store_transcription('Assistant', response_text, 'temp/transcription.log')
+				self.chat_history.append({"role": "assistant", "content": response_text})
+				self.store_chat_history()
 
 				# generate audio from the response text
 				self.tts.convert_to_wave(response_text, 'temp/response.wav')
