@@ -1,19 +1,31 @@
 import ollama
 import sys
+import logging
 
 class ResponseGenerator:
 	def __init__(self, model='llama3'):
 		self.model = model
+		
+		# download only if needed
+		needs_pull = True
+		for available_model in ollama.list().models:
+			name = available_model.model.split(':')[0]
+			logging.debug(f"Available ollama model: {name}")
+			if name == self.model:
+				needs_pull = False
+
+		if needs_pull:
+			logging.info(f"Pulling model: {self.model}")
+			ollama.pull(self.model)
 
 	def generate_response(self, chat_history):
-		ollama.pull(self.model)
-
 		response = ollama.chat(model=self.model, messages=chat_history)
 		return response['message']['content']
 
 if __name__ == "__main__":
 	user_input = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "Hello, how can you help me?"
-	response_generator = ResponseGenerator()
+	model = 'gemma3'
+	response_generator = ResponseGenerator(model=model)
 
 	chat_history = [
 		{

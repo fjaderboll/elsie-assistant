@@ -24,7 +24,7 @@ cp settings.default.ini settings.ini
 ```
 
 ## Run
-The first time you run it, make sure to have a Internet connection.
+The first time you run it, make sure to have an Internet connection.
 
 ```shell
 # start ollama server
