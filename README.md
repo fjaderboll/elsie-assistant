@@ -39,9 +39,10 @@ python3 app/assistant.py [--help]
 python3 app/assistant.py 2> /dev/null
 ```
 
-## Optional models
-Depending on your needs and computer performance, you may want tweak `settings.ini`.
-See comments in that file for more details.
+## Different models
+Depending on your needs and computer performance, you may want try out different models.
+This will greatly affect the type of responses you get, as well as the speed.
+Have a look in `settings.ini` for more details.
 
 ## Related projects
 * https://github.com/PromtEngineer/Verbi/ (another voice assistant)

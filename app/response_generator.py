@@ -8,22 +8,22 @@ class ResponseGenerator:
 		
 		# download only if needed
 		needs_pull = True
-		for available_model in ollama.list().models:
-			name = available_model.model.split(':')[0]
-			logging.debug(f"Available ollama model: {name}")
-			if name == self.model:
+		model_full_name = f"{self.model}:latest" if ':' not in self.model else self.model
+		for cached_model in ollama.list().models:
+			logging.debug(f"Available ollama model: {cached_model.model}")
+			if cached_model.model == model_full_name:
 				needs_pull = False
 
 		if needs_pull:
-			logging.info(f"Pulling model: {self.model}")
-			ollama.pull(self.model)
+			logging.info(f"Pulling ollama model: {model_full_name}")
+			ollama.pull(model_full_name)
 
 	def generate_response(self, chat_history):
 		response = ollama.chat(model=self.model, messages=chat_history)
 		return response['message']['content']
 
 if __name__ == "__main__":
-	user_input = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "Hello, how can you help me?"
+	user_input = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "Hello, how are you?"
 	model = 'gemma3'
 	response_generator = ResponseGenerator(model=model)
 
