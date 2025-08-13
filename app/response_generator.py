@@ -6,10 +6,9 @@ class ResponseGenerator:
 		self.model = model
 
 	def generate_response(self, chat_history):
-		response = ollama.chat(
-			model=self.model,
-			messages=chat_history,
-		)
+		ollama.pull(self.model)
+
+		response = ollama.chat(model=self.model, messages=chat_history)
 		return response['message']['content']
 
 if __name__ == "__main__":

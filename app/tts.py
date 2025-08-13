@@ -3,7 +3,7 @@ from pathlib import Path
 from piper import PiperVoice, download_voices
 
 class TextToSpeech:
-	def __init__(self, model):
+	def __init__(self, model='en_US-lessac-medium'):
 		download_voices.download_voice(model, Path('models'))
 		self.voice = PiperVoice.load(f'models/{model}.onnx')
 
