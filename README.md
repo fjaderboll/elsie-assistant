@@ -27,9 +27,9 @@ cp settings.default.ini settings.ini
 The first time you run it, make sure to have an Internet connection.
 
 ```shell
-# start ollama server
-docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama             # only CPU
-docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama --gpus=all ollama/ollama  # with GPUs
+# start ollama server (eg via Docker)
+docker run -d -p 11434:11434 --name ollama ollama/ollama             # only CPU
+docker run -d -p 11434:11434 --name ollama --gpus=all ollama/ollama  # with GPUs
 
 # start assistant
 source .venv/bin/activate
