@@ -8,7 +8,7 @@ import traceback
 from configparser import ConfigParser
 
 from audio_processor import AudioProcessor
-from transcriber import Transcriber
+from stt import SpeechToText
 from response_generator import ResponseGenerator
 from tts import TextToSpeech
 
@@ -16,7 +16,7 @@ class Assistant:
 	def __init__(self, config: ConfigParser):
 		self.debug = config['default'].getboolean('debug')
 		self.audio_processor = AudioProcessor()
-		self.transcriber = Transcriber(lang=config['speech-to-text']['lang'], model_name=config['speech-to-text'].get('model', None))
+		self.stt = SpeechToText(engine=config['speech-to-text']['engine'], model_name=config['speech-to-text'].get('model', None))
 		self.response_generator = ResponseGenerator(model=config['response-generation']['model'])
 		self.tts = TextToSpeech(model=config['text-to-speech']['model'])
 		self.load_chat_history(config['response-generation']['personality'], config['default'].get('chat_history_file', None))
@@ -55,7 +55,7 @@ class Assistant:
 					self.audio_processor.store_audio(recorded_audio, 'temp/user_recording.wav')
 			
 				# transcribe the audio
-				user_text = self.transcriber.transcribe_audio(wave_data=recorded_audio)
+				user_text = self.stt.transcribe_audio(wave_data=recorded_audio)
 				if not user_text:
 					logging.warning("Transcription not successful, starting to record again")
 					continue

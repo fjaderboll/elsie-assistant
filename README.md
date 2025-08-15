@@ -2,7 +2,8 @@
 
 ## About
 Realtime AI voice assistant, or just your friendly chat bot.
-It's fully open source and offline and runs local on your computer.
+It's all free (no API keys or accounts needed anywhere) and runs
+offline on your local computer.
 
 End goal is to integrate this in a physical robot, like the *Elsie*
 assistant from the movie *M3GAN*, hence the name.
@@ -33,7 +34,8 @@ docker run -d -p 11434:11434 --name ollama --gpus=all ollama/ollama  # with GPUs
 
 # start assistant
 source .venv/bin/activate
-python3 app/assistant.py [--help]
+python3 app/assistant.py                               # uses settings.ini by default
+python3 app/assistant.py --config settings.swedish.ini # specify custom settings file
 
 # workaround for cleaner output until I find a way to fix that
 python3 app/assistant.py 2> /dev/null
